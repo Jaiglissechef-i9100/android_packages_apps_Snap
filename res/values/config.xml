@@ -28,6 +28,9 @@
          of the fullscreen pano preview. -->
     <bool name="enable_warped_pano_preview">true</bool>
 
+    <!-- Samsung Camcorder Mode -->
+    <bool name="needsSamsungCamMode">false</bool>
+
     <!-- Decode YV16 format on Samsung HDR hardware -->
     <bool name="needsSamsungHDRFormat">false</bool>
 

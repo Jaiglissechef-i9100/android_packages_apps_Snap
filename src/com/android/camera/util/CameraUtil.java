@@ -214,11 +214,16 @@ public class CameraUtil {
                 context.getString(R.string.image_file_name_format));
         sDeviceKeysPresent = context.getResources().getInteger(
                 com.android.internal.R.integer.config_deviceHardwareKeys);
+        sSamsungCamMode = context.getResources().getBoolean(R.bool.needsSamsungCamMode);
         sSamsungHDRFormat = context.getResources().getBoolean(R.bool.needsSamsungHDRFormat);
     }
 
     public static int dpToPixel(int dp) {
         return Math.round(sPixelDensity * dp);
+    }
+
+    public static boolean useSamsungCamMode() {
+        return sSamsungCamMode;
     }
 
     public static boolean needSamsungHDRFormat() {

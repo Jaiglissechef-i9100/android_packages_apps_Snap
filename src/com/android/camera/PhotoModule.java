@@ -2709,6 +2709,10 @@ public class PhotoModule
 
         setDisplayOrientation();
 
+        // Set camera mode
+        CameraSettings.setVideoMode(mParameters, false);
+        mCameraDevice.setParameters(mParameters);
+
         if (!mSnapshotOnIdle) {
             // If the focus mode is continuous autofocus, call cancelAutoFocus to
             // resume it because it may have been paused by autoFocus call.
@@ -3692,6 +3696,8 @@ public class PhotoModule
 
             if ((updateSet & UPDATE_PARAM_INITIALIZE) != 0) {
                 updateCameraParametersInitialize();
+                // Set camera mode
+                CameraSettings.setVideoMode(mParameters, false);
             }
 
             if ((updateSet & UPDATE_PARAM_ZOOM) != 0) {
