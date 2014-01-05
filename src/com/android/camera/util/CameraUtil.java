@@ -189,6 +189,18 @@ public class CameraUtil {
     // Get available hardware keys
     private static int sDeviceKeysPresent;
 
+    // Use samsung HDR format
+    private static boolean sSamsungHDRFormat;
+
+    // Samsung camcorder mode
+    private static boolean sSamsungCamMode;
+
+    // For setting video size before recording starts
+    private static boolean sEarlyVideoSize;
+
+    // Continuous focus mode needs autoFocusCall
+    private static boolean sContinuousFocusNeedsAutoFocusCall;
+
     private CameraUtil() {
     }
 
@@ -202,10 +214,15 @@ public class CameraUtil {
                 context.getString(R.string.image_file_name_format));
         sDeviceKeysPresent = context.getResources().getInteger(
                 com.android.internal.R.integer.config_deviceHardwareKeys);
+        sSamsungHDRFormat = context.getResources().getBoolean(R.bool.needsSamsungHDRFormat);
     }
 
     public static int dpToPixel(int dp) {
         return Math.round(sPixelDensity * dp);
+    }
+
+    public static boolean needSamsungHDRFormat() {
+        return sSamsungHDRFormat;
     }
 
     // Rotates the bitmap by the specified degree.
@@ -336,6 +353,47 @@ public class CameraUtil {
             Log.e(TAG, "Got oom exception ", ex);
             return null;
         }
+    }
+
+    public static Bitmap decodeYUV422P(byte[] yuv422p, int width, int height)
+                        throws NullPointerException, IllegalArgumentException {
+        final int frameSize = width * height;
+        int[] rgb = new int[frameSize];
+        for (int j = 0, yp = 0; j < height; j++) {
+            int up = frameSize + (j * (width/2)), u = 0, v = 0;
+            int vp = ((int)(frameSize*1.5) + (j*(width/2)));
+            for (int i = 0; i < width; i++, yp++) {
+                int y = (0xff & ((int) yuv422p[yp])) - 16;
+                if (y < 0)
+                    y = 0;
+                if ((i & 1) == 0) {
+                    u = (0xff & yuv422p[up++]) - 128;
+                    v = (0xff & yuv422p[vp++]) - 128;
+                }
+
+                int y1192 = 1192 * y;
+                int r = (y1192 + 1634 * v);
+                int g = (y1192 - 833 * v - 400 * u);
+                int b = (y1192 + 2066 * u);
+
+                if (r < 0)
+                    r = 0;
+                else if (r > 262143)
+                    r = 262143;
+                if (g < 0)
+                    g = 0;
+                else if (g > 262143)
+                    g = 262143;
+                if (b < 0)
+                    b = 0;
+                else if (b > 262143)
+                    b = 262143;
+
+                rgb[yp] = 0xff000000 | ((r << 6) & 0xff0000)
+                        | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
+            }
+        }
+        return Bitmap.createBitmap(rgb, width, height, Bitmap.Config.ARGB_8888);
     }
 
     public static void closeSilently(Closeable c) {
