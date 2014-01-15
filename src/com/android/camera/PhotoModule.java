@@ -789,9 +789,11 @@ public class PhotoModule
             return;
         }
         setPreviewFrameLayoutCameraOrientation();
-        Size size = mParameters.getPreviewSize();
-        Log.i(TAG, "Using preview width = " + size.width + "& height = " + size.height);
-        mUI.setAspectRatio((float) size.width / size.height);
+        if (mParameters != null) {
+            Size size = mParameters.getPictureSize();
+            Log.e(TAG,"Width = "+ size.width+ "Height = "+size.height);
+            mUI.setAspectRatio((float) size.width / size.height);
+        }
     }
 
     @Override
